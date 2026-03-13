@@ -1,0 +1,639 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>24 節氣與地支月抽考工具</title>
+    <style>
+      :root{
+        --bg:#f7f7f8;
+        --card:#ffffff;
+        --text:#1f2328;
+        --muted:#6b7280;
+        --border:#e5e7eb;
+        --focus:#111827;
+        --ok:#15803d;
+        --bad:#b91c1c;
+        --shadow: 0 10px 30px rgba(0,0,0,.06);
+        --radius: 14px;
+        --space: 16px;
+      }
+      *{ box-sizing:border-box; }
+      body{
+        margin:0;
+        font-family: system-ui, -apple-system, "Segoe UI", "Noto Sans TC", "Microsoft JhengHei", Arial, sans-serif;
+        background:var(--bg);
+        color:var(--text);
+      }
+      .wrap{
+        max-width: 920px;
+        margin: 0 auto;
+        padding: 18px;
+      }
+      header{
+        display:flex;
+        align-items:flex-end;
+        justify-content:space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+      h1{
+        font-size: 18px;
+        line-height: 1.2;
+        margin: 0;
+        font-weight: 700;
+        letter-spacing: .5px;
+      }
+      .hint{
+        margin:0;
+        color: var(--muted);
+        font-size: 12px;
+        line-height: 1.4;
+        text-align:right;
+        max-width: 380px;
+      }
+      .card{
+        background:var(--card);
+        border:1px solid var(--border);
+        border-radius: var(--radius);
+        box-shadow: var(--shadow);
+        padding: 16px;
+      }
+      .legend{
+        display:flex;
+        flex-wrap:wrap;
+        gap: 8px 10px;
+        padding: 10px 12px;
+        border: 1px dashed var(--border);
+        border-radius: 12px;
+        color: var(--muted);
+        font-size: 12px;
+        margin-bottom: 14px;
+      }
+      .topRow{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+      .progressWrap{
+        flex: 1;
+        min-width: 240px;
+      }
+      .progressText{
+        font-size: 12px;
+        color: var(--muted);
+        margin: 0 0 6px 0;
+      }
+      .progressTrack{
+        width:100%;
+        height: 10px;
+        border-radius: 999px;
+        background: #f1f5f9;
+        border: 1px solid var(--border);
+        overflow:hidden;
+      }
+      .progressBar{
+        height:100%;
+        width: 0%;
+        background: #111827;
+      }
+      .pill{
+        display:inline-flex;
+        align-items:center;
+        gap:8px;
+        padding: 6px 10px;
+        border-radius: 999px;
+        background: #fafafa;
+        border: 1px solid var(--border);
+      }
+      .dot{
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--muted);
+        opacity: .7;
+      }
+      .grid{
+        display:grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 12px;
+      }
+      @media (max-width: 640px){
+        header{ align-items:flex-start; flex-direction:column; }
+        .hint{ text-align:left; max-width:none; }
+        .grid{ grid-template-columns: 1fr; }
+      }
+      .field{
+        display:flex;
+        flex-direction:column;
+        gap: 6px;
+      }
+      .labelRow{
+        display:flex;
+        align-items:baseline;
+        justify-content:space-between;
+        gap: 10px;
+      }
+      label{
+        font-size: 13px;
+        font-weight: 650;
+      }
+      .sub{
+        font-size: 12px;
+        color: var(--muted);
+      }
+      input{
+        width:100%;
+        padding: 12px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #fff;
+        font-size: 16px;
+        outline: none;
+        transition: border-color .12s ease, box-shadow .12s ease, background-color .12s ease;
+      }
+      input:focus{
+        border-color: rgba(17,24,39,.55);
+        box-shadow: 0 0 0 3px rgba(17,24,39,.10);
+      }
+      input[disabled]{
+        background: #f3f4f6;
+        color: #111827;
+        cursor: not-allowed;
+      }
+      .row2{
+        grid-column: 1 / -1;
+      }
+      .actions{
+        display:flex;
+        flex-wrap:wrap;
+        gap: 10px;
+        margin-top: 14px;
+      }
+      button{
+        appearance:none;
+        border: 1px solid var(--border);
+        background: #fff;
+        color: var(--text);
+        padding: 10px 14px;
+        border-radius: 12px;
+        font-weight: 650;
+        cursor: pointer;
+        transition: transform .05s ease, background-color .12s ease, border-color .12s ease;
+      }
+      button:active{ transform: translateY(1px); }
+      button.primary{
+        border-color: rgba(17,24,39,.35);
+        background: #111827;
+        color: #fff;
+      }
+      button[disabled]{
+        opacity: .55;
+        cursor:not-allowed;
+      }
+      .status{
+        margin-top: 12px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        border: 1px solid var(--border);
+        background: #fafafa;
+        font-size: 13px;
+        line-height: 1.45;
+        color: var(--muted);
+        min-height: 44px;
+        display:flex;
+        align-items:center;
+      }
+      .stats{
+        margin-top: 10px;
+        font-size: 12px;
+        color: var(--muted);
+        line-height: 1.5;
+      }
+      .statsLine{
+        margin: 0;
+      }
+      .okText{ color: var(--ok); font-weight: 750; }
+      .badText{ color: var(--bad); font-weight: 750; }
+      .okInput{
+        border-color: rgba(21,128,61,.55) !important;
+        box-shadow: 0 0 0 3px rgba(21,128,61,.10) !important;
+      }
+      .badInput{
+        border-color: rgba(185,28,28,.55) !important;
+        box-shadow: 0 0 0 3px rgba(185,28,28,.10) !important;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <div>
+          <h1>24 節氣與地支月抽考工具</h1>
+        </div>
+        <p class="hint">
+          規則：每題會先給你 1 個欄位，其餘 4 個請自己填。<br/>
+          正確：顯示綠色並在 50ms 自動下一題；錯誤：顯示紅色與正解，需按「下一題」。
+        </p>
+      </header>
+
+      <div class="card">
+        <div class="topRow">
+          <div class="progressWrap" aria-label="進度">
+            <p class="progressText" id="progressText">進度：0 / 60</p>
+            <div class="progressTrack" role="progressbar" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0">
+              <div class="progressBar" id="progressBar"></div>
+            </div>
+          </div>
+          <div>
+            <button id="resetProgressBtn" type="button">進度歸 0</button>
+          </div>
+        </div>
+
+        <div class="legend" aria-label="出題重點">
+          <span class="pill"><span class="dot"></span>地支（月）</span>
+          <span class="pill"><span class="dot"></span>24 節氣（節 / 氣）</span>
+          <span class="pill"><span class="dot"></span>季節（你的 12 分法）</span>
+        </div>
+
+        <div class="grid">
+          <div class="field">
+            <div class="labelRow">
+              <label for="month">月份</label>
+              <span class="sub">例：1月</span>
+            </div>
+            <input id="month" autocomplete="off" inputmode="numeric" placeholder="請輸入…">
+          </div>
+
+          <div class="field">
+            <div class="labelRow">
+              <label for="branchMonth">地支月</label>
+              <span class="sub">例：丑月</span>
+            </div>
+            <input id="branchMonth" autocomplete="off" placeholder="請輸入…">
+          </div>
+
+          <div class="field">
+            <div class="labelRow">
+              <label for="jie">節（前半月）</label>
+              <span class="sub">例：小寒</span>
+            </div>
+            <input id="jie" autocomplete="off" placeholder="請輸入…">
+          </div>
+
+          <div class="field">
+            <div class="labelRow">
+              <label for="qi">氣（後半月）</label>
+              <span class="sub">例：大寒</span>
+            </div>
+            <input id="qi" autocomplete="off" placeholder="請輸入…">
+          </div>
+
+          <div class="field row2">
+            <div class="labelRow">
+              <label for="season">季節</label>
+              <span class="sub">初春、春、春末、初夏、夏、夏末、初秋、秋、秋末、初冬、冬、冬末</span>
+            </div>
+            <input id="season" autocomplete="off" placeholder="請輸入…">
+          </div>
+        </div>
+
+        <div class="actions">
+          <button class="primary" id="checkBtn" type="button">核對</button>
+          <button id="nextBtn" type="button">下一題</button>
+          <button id="revealBtn" type="button">顯示本題正解</button>
+          <button id="resetBtn" type="button">重新隨機（不重複）</button>
+        </div>
+
+        <div class="status" id="status" role="status" aria-live="polite"></div>
+        <div class="stats">
+          <p class="statsLine" id="statsLine1">答對：0 題　｜　答錯：0 題　｜　正確率：0%</p>
+          <p class="statsLine" id="statsLine2">總答題時間：0:00（平均 0 秒 / 題）</p>
+        </div>
+      </div>
+    </div>
+
+    <script>
+// 24 節氣與地支月抽考工具（內建資料 + 隨機出題）
+
+const DATA = [
+  { month: "1月", branchMonth: "丑月", jie: "小寒", qi: "大寒", season: "冬末" },
+  { month: "2月", branchMonth: "寅月", jie: "立春", qi: "雨水", season: "初春" },
+  { month: "3月", branchMonth: "卯月", jie: "驚蟄", qi: "春分", season: "春" },
+  { month: "4月", branchMonth: "辰月", jie: "清明", qi: "穀雨", season: "春末" },
+  { month: "5月", branchMonth: "巳月", jie: "立夏", qi: "小滿", season: "初夏" },
+  { month: "6月", branchMonth: "午月", jie: "芒種", qi: "夏至", season: "夏" },
+  { month: "7月", branchMonth: "未月", jie: "小暑", qi: "大暑", season: "夏末" },
+  { month: "8月", branchMonth: "申月", jie: "立秋", qi: "處暑", season: "初秋" },
+  { month: "9月", branchMonth: "酉月", jie: "白露", qi: "秋分", season: "秋" },
+  { month: "10月", branchMonth: "戌月", jie: "寒露", qi: "霜降", season: "秋末" },
+  { month: "11月", branchMonth: "亥月", jie: "立冬", qi: "小雪", season: "初冬" },
+  { month: "12月", branchMonth: "子月", jie: "大雪", qi: "冬至", season: "冬" },
+];
+
+// 5 個欄位（共 12*5=60 個資料格）
+const FIELDS = [
+  { key: "month", label: "月份" },
+  { key: "branchMonth", label: "地支月" },
+  { key: "jie", label: "節（前半月）" },
+  { key: "qi", label: "氣（後半月）" },
+  { key: "season", label: "季節" },
+];
+
+const els = {
+  month: document.getElementById("month"),
+  branchMonth: document.getElementById("branchMonth"),
+  jie: document.getElementById("jie"),
+  qi: document.getElementById("qi"),
+  season: document.getElementById("season"),
+  status: document.getElementById("status"),
+  progressText: document.getElementById("progressText"),
+  progressBar: document.getElementById("progressBar"),
+  statsLine1: document.getElementById("statsLine1"),
+  statsLine2: document.getElementById("statsLine2"),
+  checkBtn: document.getElementById("checkBtn"),
+  nextBtn: document.getElementById("nextBtn"),
+  revealBtn: document.getElementById("revealBtn"),
+  resetBtn: document.getElementById("resetBtn"),
+  resetProgressBtn: document.getElementById("resetProgressBtn"),
+};
+
+// 題庫：12 個月份 × 5 個欄位 = 60 題（出過不重複）
+const TOTAL_QUESTIONS = DATA.length * FIELDS.length;
+let remainingQuestions = [];
+let currentQuestion = null; // { rowIndex, givenFieldKey }
+let currentRow = null;      // DATA[currentQuestion.rowIndex]
+let givenFieldKey = null;   // currentQuestion.givenFieldKey
+let locked = false;         // 防止答對自動跳題時重複觸發
+let correctCount = 0;
+let wrongCount = 0;
+let answeredCount = 0;
+let totalAnswerMs = 0;
+let questionStartTime = null;
+
+function normalize(s) {
+  return (s ?? "")
+    .toString()
+    .replace(/\s+/g, "")
+    .replace(/[　]/g, "")
+    .trim();
+}
+
+function normalizeMonth(s) {
+  // 只比對阿拉伯數字：1,2,...,12；忽略「月」與其他字元
+  return (s ?? "")
+    .toString()
+    .replace(/[^\d]/g, "")
+    .trim();
+}
+
+function normalizeBranchMonth(s) {
+  // 比對地支：丑、寅...；忽略「月」與空白
+  return (s ?? "")
+    .toString()
+    .replace(/月/g, "")
+    .replace(/\s+/g, "")
+    .replace(/[　]/g, "")
+    .trim();
+}
+
+function shuffleInPlace(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+function clearMarks() {
+  for (const f of FIELDS) {
+    const input = els[f.key];
+    input.classList.remove("okInput", "badInput");
+  }
+}
+
+function setStatus(html) {
+  els.status.innerHTML = html;
+}
+
+function updateStatsDisplay() {
+  const total = answeredCount;
+  const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+  const totalSeconds = totalAnswerMs / 1000;
+  const minutes = Math.floor(totalSeconds / 60);
+  const seconds = Math.round(totalSeconds % 60);
+  const avgSeconds = total > 0 ? (totalSeconds / total) : 0;
+
+  if (els.statsLine1) {
+    els.statsLine1.textContent = `答對：${correctCount} 題　｜　答錯：${wrongCount} 題　｜　正確率：${accuracy}%`;
+  }
+
+  if (els.statsLine2) {
+    const secStr = String(seconds).padStart(2, "0");
+    const avgStr = avgSeconds.toFixed(1).replace(/\.0$/, "");
+    els.statsLine2.textContent = `總答題時間：${minutes}:${secStr}（平均 ${avgStr} 秒 / 題）`;
+  }
+}
+
+function setProgress() {
+  const doneNow = TOTAL_QUESTIONS - remainingQuestions.length;
+  if (els.progressText) els.progressText.textContent = `進度：${doneNow} / ${TOTAL_QUESTIONS}`;
+  if (els.progressBar) els.progressBar.style.width = `${(doneNow / TOTAL_QUESTIONS) * 100}%`;
+  const track = document.querySelector(".progressTrack[role='progressbar']");
+  if (track) track.setAttribute("aria-valuenow", String(doneNow));
+}
+
+function setGivenField(fieldKey) {
+  givenFieldKey = fieldKey;
+  for (const f of FIELDS) {
+    const input = els[f.key];
+    const isGiven = f.key === givenFieldKey;
+    input.disabled = isGiven;
+    input.dataset.given = isGiven ? "1" : "0";
+  }
+}
+
+function fillInputsForNewQuestion() {
+  clearMarks();
+  locked = false;
+  setStatus("請輸入其餘 4 個欄位，完成後按「核對」。");
+  questionStartTime = performance.now();
+
+  for (const f of FIELDS) {
+    const input = els[f.key];
+    if (f.key === givenFieldKey) {
+      input.value = currentRow[f.key];
+    } else {
+      input.value = "";
+    }
+  }
+
+  const firstEditable = FIELDS.map(f => els[f.key]).find(i => !i.disabled);
+  if (firstEditable) firstEditable.focus();
+}
+
+function buildQuestionBank() {
+  const q = [];
+  for (let rowIndex = 0; rowIndex < DATA.length; rowIndex++) {
+    for (const f of FIELDS) {
+      q.push({ rowIndex, givenFieldKey: f.key });
+    }
+  }
+  return q;
+}
+
+function resetProgress() {
+  remainingQuestions = shuffleInPlace(buildQuestionBank());
+  currentQuestion = null;
+  currentRow = null;
+  givenFieldKey = null;
+  correctCount = 0;
+  wrongCount = 0;
+  answeredCount = 0;
+  totalAnswerMs = 0;
+  questionStartTime = null;
+  els.checkBtn.disabled = false;
+  els.nextBtn.disabled = false;
+  els.revealBtn.disabled = false;
+  els.resetBtn.disabled = false;
+  setProgress();
+  updateStatsDisplay();
+  nextQuestion();
+}
+
+function nextQuestion() {
+  if (remainingQuestions.length === 0) {
+    clearMarks();
+    locked = false;
+    setProgress();
+    updateStatsDisplay();
+    const total = answeredCount;
+    const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
+    const totalSeconds = totalAnswerMs / 1000;
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.round(totalSeconds % 60);
+    const secStr = String(seconds).padStart(2, "0");
+    setStatus(
+      `<span class="okText">恭喜完成 60 題！</span><br>` +
+      `正確率：${accuracy}%　｜　總時間：${minutes}:${secStr}<br>` +
+      `可按「進度歸 0」重新開始一輪。`
+    );
+    els.checkBtn.disabled = true;
+    els.nextBtn.disabled = true;
+    els.revealBtn.disabled = true;
+    els.resetBtn.disabled = true;
+    return;
+  }
+
+  currentQuestion = remainingQuestions.pop();
+  currentRow = DATA[currentQuestion.rowIndex];
+  setGivenField(currentQuestion.givenFieldKey);
+  setProgress();
+  fillInputsForNewQuestion();
+}
+
+function getUserAnswers() {
+  const out = {};
+  for (const f of FIELDS) out[f.key] = els[f.key].value;
+  return out;
+}
+
+function checkAnswer() {
+  if (locked) return;
+  if (!currentRow || !givenFieldKey) nextQuestion();
+
+  clearMarks();
+
+  const now = performance.now();
+  if (questionStartTime != null) {
+    totalAnswerMs += now - questionStartTime;
+    answeredCount += 1;
+    questionStartTime = null;
+  }
+
+  const user = getUserAnswers();
+  const correct = currentRow;
+
+  let allCorrect = true;
+  const wrongKeys = [];
+
+  for (const f of FIELDS) {
+    const input = els[f.key];
+    const isGiven = input.disabled;
+    if (isGiven) {
+      input.classList.add("okInput");
+      continue;
+    }
+    let ok;
+    if (f.key === "month") {
+      ok = normalizeMonth(user[f.key]) === normalizeMonth(correct[f.key]);
+    } else if (f.key === "branchMonth") {
+      ok = normalizeBranchMonth(user[f.key]) === normalizeBranchMonth(correct[f.key]);
+    } else {
+      ok = normalize(user[f.key]) === normalize(correct[f.key]);
+    }
+    if (ok) {
+      input.classList.add("okInput");
+    } else {
+      input.classList.add("badInput");
+      allCorrect = false;
+      wrongKeys.push(f.key);
+    }
+  }
+
+  if (allCorrect) {
+    correctCount += 1;
+    updateStatsDisplay();
+    locked = true;
+    setStatus(`<span class="okText">正確</span>（50ms 後自動下一題）`);
+    window.setTimeout(() => {
+      nextQuestion();
+    }, 50);
+    return;
+  }
+
+  const correctLine = `正解：${correct.month}／${correct.branchMonth}／${correct.jie}／${correct.qi}／${correct.season}`;
+  const wrongLabels = wrongKeys
+    .map(k => FIELDS.find(f => f.key === k)?.label ?? k)
+    .join("、");
+
+  wrongCount += 1;
+  updateStatsDisplay();
+
+  setStatus(
+    `<span class="badText">錯誤</span>（錯在：${wrongLabels}）<br>${correctLine}<br>請按「下一題」繼續。`
+  );
+}
+
+function revealAnswer() {
+  if (!currentRow) return;
+  const c = currentRow;
+  setStatus(
+    `本題正解：${c.month}／${c.branchMonth}／${c.jie}／${c.qi}／${c.season}`
+  );
+}
+
+function wireEvents() {
+  els.checkBtn.addEventListener("click", checkAnswer);
+  els.nextBtn.addEventListener("click", () => nextQuestion());
+  els.revealBtn.addEventListener("click", revealAnswer);
+  els.resetBtn.addEventListener("click", () => nextQuestion());
+  els.resetProgressBtn.addEventListener("click", resetProgress);
+
+  for (const f of FIELDS) {
+    els[f.key].addEventListener("keydown", (e) => {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        checkAnswer();
+      }
+    });
+  }
+}
+
+wireEvents();
+resetProgress();
+    </script>
+  </body>
+</html>
