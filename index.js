@@ -1,89 +1,62 @@
-// 24 節氣與地支月抽考工具（內建資料 + 隨機出題）
+// 天干臨官位／地支藏干 抽考工具（SPA）
 
-const DATA = [
-  { month: "1月", branchMonth: "丑月", jie: "小寒", qi: "大寒", season: "冬末" },
-  { month: "2月", branchMonth: "寅月", jie: "立春", qi: "雨水", season: "初春" },
-  { month: "3月", branchMonth: "卯月", jie: "驚蟄", qi: "春分", season: "春" },
-  { month: "4月", branchMonth: "辰月", jie: "清明", qi: "穀雨", season: "春末" },
-  { month: "5月", branchMonth: "巳月", jie: "立夏", qi: "小滿", season: "初夏" },
-  { month: "6月", branchMonth: "午月", jie: "芒種", qi: "夏至", season: "夏" },
-  { month: "7月", branchMonth: "未月", jie: "小暑", qi: "大暑", season: "夏末" },
-  { month: "8月", branchMonth: "申月", jie: "立秋", qi: "處暑", season: "初秋" },
-  { month: "9月", branchMonth: "酉月", jie: "白露", qi: "秋分", season: "秋" },
-  { month: "10月", branchMonth: "戌月", jie: "寒露", qi: "霜降", season: "秋末" },
-  { month: "11月", branchMonth: "亥月", jie: "立冬", qi: "小雪", season: "初冬" },
-  { month: "12月", branchMonth: "子月", jie: "大雪", qi: "冬至", season: "冬" },
+const TIANGAN_DATA = [
+  { stem: "甲", attr: "陽木", pos: "寅" },
+  { stem: "乙", attr: "陰木", pos: "卯" },
+  { stem: "丙", attr: "陽火", pos: "巳" },
+  { stem: "丁", attr: "陰火", pos: "午" },
+  { stem: "戊", attr: "陽土", pos: "寅巳" },
+  { stem: "己", attr: "陰土", pos: "酉午" },
+  { stem: "庚", attr: "陽金", pos: "申" },
+  { stem: "辛", attr: "陰金", pos: "酉" },
+  { stem: "壬", attr: "陽水", pos: "亥" },
+  { stem: "癸", attr: "陰水", pos: "子" },
 ];
 
-// 5 個欄位（共 12*5=60 個資料格）
-const FIELDS = [
-  { key: "month", label: "月份" },
-  { key: "branchMonth", label: "地支月" },
-  { key: "jie", label: "節（前半月）" },
-  { key: "qi", label: "氣（後半月）" },
-  { key: "season", label: "季節" },
+const DIZHI_DATA = [
+  { branch: "子", main: "癸水", mid: "-", rem: "-" },
+  { branch: "丑", main: "己土", mid: "癸水", rem: "辛金" },
+  { branch: "寅", main: "甲木", mid: "丙火", rem: "戊土" },
+  { branch: "卯", main: "乙木", mid: "-", rem: "-" },
+  { branch: "辰", main: "戊土", mid: "乙木", rem: "癸水" },
+  { branch: "巳", main: "丙火", mid: "庚金", rem: "戊土" },
+  { branch: "午", main: "丁火", mid: "己土", rem: "-" },
+  { branch: "未", main: "己土", mid: "丁火", rem: "乙木" },
+  { branch: "申", main: "庚金", mid: "壬水", rem: "戊土" },
+  { branch: "酉", main: "辛金", mid: "-", rem: "-" },
+  { branch: "戌", main: "戊土", mid: "辛金", rem: "丁火" },
+  { branch: "亥", main: "壬水", mid: "甲木", rem: "-" },
 ];
 
 const els = {
-  month: document.getElementById("month"),
-  branchMonth: document.getElementById("branchMonth"),
-  jie: document.getElementById("jie"),
-  qi: document.getElementById("qi"),
-  season: document.getElementById("season"),
-  status: document.getElementById("status"),
+  menuView: document.getElementById("menuView"),
+  quizView: document.getElementById("quizView"),
+  backBtn: document.getElementById("backBtn"),
+  startTiangan: document.getElementById("startTiangan"),
+  startDizhi: document.getElementById("startDizhi"),
+
   progressText: document.getElementById("progressText"),
   progressBar: document.getElementById("progressBar"),
-  statsLine1: document.getElementById("statsLine1"),
-  statsLine2: document.getElementById("statsLine2"),
-  checkBtn: document.getElementById("checkBtn"),
-  nextBtn: document.getElementById("nextBtn"),
-  revealBtn: document.getElementById("revealBtn"),
-  resetBtn: document.getElementById("resetBtn"),
-  resetProgressBtn: document.getElementById("resetProgressBtn"),
+  progressTrack: document.querySelector(".progressTrack[role='progressbar']"),
+
+  skipBtn: document.getElementById("skipBtn"),
+  status: document.getElementById("status"),
+
+  tianganPanel: document.getElementById("tianganPanel"),
+  tg_stem: document.getElementById("tg_stem"),
+  tg_attr: document.getElementById("tg_attr"),
+  tg_pos: document.getElementById("tg_pos"),
+
+  dizhiPanel: document.getElementById("dizhiPanel"),
+  dz_branch: document.getElementById("dz_branch"),
+  dz_main: document.getElementById("dz_main"),
+  dz_mid: document.getElementById("dz_mid"),
+  dz_rem: document.getElementById("dz_rem"),
+
+  doneScreen: document.getElementById("doneScreen"),
+  doneText: document.getElementById("doneText"),
+  doneBackBtn: document.getElementById("doneBackBtn"),
 };
-
-// 題庫：12 個月份 × 5 個欄位 = 60 題（出過不重複）
-const TOTAL_QUESTIONS = DATA.length * FIELDS.length;
-let remainingQuestions = [];
-let currentQuestion = null; // { rowIndex, givenFieldKey }
-let currentRow = null;      // DATA[currentQuestion.rowIndex]
-let givenFieldKey = null;   // currentQuestion.givenFieldKey
-let locked = false;         // 防止答對自動跳題時重複觸發
-let correctCount = 0;
-let wrongCount = 0;
-let answeredCount = 0;
-let totalAnswerMs = 0;
-let questionStartTime = null;
-
-function normalize(s) {
-  return (s ?? "")
-    .toString()
-    .replace(/\s+/g, "")
-    .replace(/[　]/g, "")
-    .trim();
-}
-
-function normalizeMonth(s) {
-  // 只比對阿拉伯數字：1,2,...,12；忽略「月」與其他字元
-  return (s ?? "")
-    .toString()
-    .replace(/[^\d]/g, "")
-    .trim();
-}
-
-function normalizeBranchMonth(s) {
-  // 比對地支：丑、寅...；忽略「月」與空白
-  return (s ?? "")
-    .toString()
-    .replace(/月/g, "")
-    .replace(/\s+/g, "")
-    .replace(/[　]/g, "")
-    .trim();
-}
-
-function pickRandom(arr) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
 
 function shuffleInPlace(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -93,236 +66,262 @@ function shuffleInPlace(arr) {
   return arr;
 }
 
-function clearMarks() {
-  for (const f of FIELDS) {
-    const input = els[f.key];
-    input.classList.remove("okInput", "badInput");
-  }
+function normalize(s) {
+  return (s ?? "").toString().replace(/\s+/g, "").replace(/[　]/g, "").trim();
+}
+
+function normalizeDash(s) {
+  const t = normalize(s);
+  if (t === "" || t === "-" || t === "－" || t === "—" || t === "–") return "-";
+  return t;
+}
+
+function clearMarks(inputs) {
+  for (const i of inputs) i.classList.remove("okInput", "badInput");
 }
 
 function setStatus(html) {
   els.status.innerHTML = html;
 }
 
-function updateStatsDisplay() {
-  const total = answeredCount;
-  const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-  const totalSeconds = totalAnswerMs / 1000;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.round(totalSeconds % 60);
-  const avgSeconds = total > 0 ? (totalSeconds / total) : 0;
-
-  if (els.statsLine1) {
-    els.statsLine1.textContent = `答對：${correctCount} 題　｜　答錯：${wrongCount} 題　｜　正確率：${accuracy}%`;
-  }
-
-  if (els.statsLine2) {
-    const secStr = String(seconds).padStart(2, "0");
-    const avgStr = avgSeconds.toFixed(1).replace(/\.0$/, "");
-    els.statsLine2.textContent = `總答題時間：${minutes}:${secStr}（平均 ${avgStr} 秒 / 題）`;
-  }
+function setProgress(done, total) {
+  els.progressText.textContent = `進度：${done}/${total}`;
+  els.progressTrack?.setAttribute("aria-valuemin", "0");
+  els.progressTrack?.setAttribute("aria-valuemax", String(total));
+  els.progressTrack?.setAttribute("aria-valuenow", String(done));
+  const pct = total === 0 ? 0 : (done / total) * 100;
+  els.progressBar.style.width = `${pct}%`;
 }
 
-function setProgress() {
-  const doneNow = TOTAL_QUESTIONS - remainingQuestions.length;
-  if (els.progressText) els.progressText.textContent = `進度：${doneNow} / ${TOTAL_QUESTIONS}`;
-  if (els.progressBar) els.progressBar.style.width = `${(doneNow / TOTAL_QUESTIONS) * 100}%`;
-  const track = document.querySelector(".progressTrack[role='progressbar']");
-  if (track) track.setAttribute("aria-valuenow", String(doneNow));
+function showMenu() {
+  els.menuView.style.display = "block";
+  els.quizView.classList.remove("show");
+  els.tianganPanel.style.display = "none";
+  els.dizhiPanel.style.display = "none";
+  els.doneScreen.classList.remove("show");
+  setStatus("請選擇一個測驗模式。");
+  setProgress(0, 0);
 }
 
-function setGivenField(fieldKey) {
-  givenFieldKey = fieldKey;
-  for (const f of FIELDS) {
-    const input = els[f.key];
-    const isGiven = f.key === givenFieldKey;
-    input.disabled = isGiven;
-    input.dataset.given = isGiven ? "1" : "0";
-  }
+function showQuiz() {
+  els.menuView.style.display = "none";
+  els.quizView.classList.add("show");
+  els.doneScreen.classList.remove("show");
 }
 
-function fillInputsForNewQuestion() {
-  clearMarks();
-  locked = false;
-  setStatus("請輸入其餘 4 個欄位，完成後按「核對」。");
-  questionStartTime = performance.now();
+let mode = null; // "tiangan" | "dizhi"
+let bank = [];
+let total = 0;
+let current = null;
+let locked = false;
 
-  // 題目欄位：顯示且鎖定；其他欄位：清空讓使用者輸入
-  for (const f of FIELDS) {
-    const input = els[f.key];
-    if (f.key === givenFieldKey) {
-      input.value = currentRow[f.key];
-    } else {
-      input.value = "";
-    }
-  }
-
-  // 游標跳到第一個可輸入欄位
-  const firstEditable = FIELDS.map(f => els[f.key]).find(i => !i.disabled);
-  if (firstEditable) firstEditable.focus();
-}
-
-function buildQuestionBank() {
+function buildTianganBank() {
+  const keys = ["stem", "attr", "pos"];
   const q = [];
-  for (let rowIndex = 0; rowIndex < DATA.length; rowIndex++) {
-    for (const f of FIELDS) {
-      q.push({ rowIndex, givenFieldKey: f.key });
-    }
+  for (let i = 0; i < TIANGAN_DATA.length; i++) {
+    for (const showKey of keys) q.push({ idx: i, showKey });
   }
   return q;
 }
 
-function resetProgress() {
-  remainingQuestions = shuffleInPlace(buildQuestionBank());
-  currentQuestion = null;
-  currentRow = null;
-  givenFieldKey = null;
-  correctCount = 0;
-  wrongCount = 0;
-  answeredCount = 0;
-  totalAnswerMs = 0;
-  questionStartTime = null;
-  els.checkBtn.disabled = false;
-  els.nextBtn.disabled = false;
-  els.revealBtn.disabled = false;
-  els.resetBtn.disabled = false;
-  setProgress();
-  updateStatsDisplay();
-  nextQuestion();
+function buildDizhiBank() {
+  const q = [];
+  for (let i = 0; i < DIZHI_DATA.length; i++) q.push({ idx: i });
+  return q;
+}
+
+function setDisabledAll(panelInputs, disabled) {
+  for (const i of panelInputs) i.disabled = disabled;
+}
+
+function focusFirstEditable(panelInputs) {
+  const first = panelInputs.find(i => !i.disabled);
+  first?.focus();
+}
+
+function validateAndMaybeAdvance() {
+  if (!current || locked) return;
+
+  if (mode === "tiangan") {
+    const data = TIANGAN_DATA[current.idx];
+    const mapping = { stem: els.tg_stem, attr: els.tg_attr, pos: els.tg_pos };
+    const inputs = [els.tg_stem, els.tg_attr, els.tg_pos];
+
+    let allOk = true;
+    for (const key of ["stem", "attr", "pos"]) {
+      const input = mapping[key];
+      const isGiven = input.disabled;
+      if (isGiven) {
+        input.classList.add("okInput");
+        continue;
+      }
+      const ok = normalize(input.value) === normalize(data[key]);
+      input.classList.toggle("okInput", ok);
+      input.classList.toggle("badInput", !ok && normalize(input.value) !== "");
+      if (!ok) allOk = false;
+    }
+
+    if (allOk) {
+      locked = true;
+      setStatus(`<span class="okText">正確</span>（1 秒後自動下一題）`);
+      window.setTimeout(() => nextQuestion(), 1000);
+    } else {
+      setStatus("持續修正到全部正確後會自動跳題。");
+    }
+
+    // 空白不紅：維持中性
+    for (const i of inputs) {
+      if (!i.disabled && normalize(i.value) === "") i.classList.remove("badInput");
+    }
+    return;
+  }
+
+  // mode === "dizhi"
+  const data = DIZHI_DATA[current.idx];
+  const inputs = [els.dz_branch, els.dz_main, els.dz_mid, els.dz_rem];
+
+  // 地支是題目（鎖定）
+  els.dz_branch.classList.add("okInput");
+
+  const checks = [
+    { input: els.dz_main, correct: data.main, normalizer: normalize },
+    { input: els.dz_mid, correct: data.mid, normalizer: normalizeDash },
+    { input: els.dz_rem, correct: data.rem, normalizer: normalizeDash },
+  ];
+
+  let allOk = true;
+  for (const c of checks) {
+    const user = c.normalizer(c.input.value);
+    const ok = user === c.normalizer(c.correct);
+    c.input.classList.toggle("okInput", ok);
+    c.input.classList.toggle("badInput", !ok && normalize(c.input.value) !== "");
+    if (!ok) allOk = false;
+  }
+
+  // 空白不紅：維持中性
+  for (const c of checks) {
+    if (normalize(c.input.value) === "") c.input.classList.remove("badInput");
+  }
+
+  if (allOk) {
+    locked = true;
+    setStatus(`<span class="okText">正確</span>（1 秒後自動下一題）`);
+    window.setTimeout(() => nextQuestion(), 1000);
+  } else {
+    setStatus("提示：無中氣/餘氣者請輸入「-」。修正到全對會自動跳題。");
+  }
+}
+
+function renderQuestion() {
+  locked = false;
+  clearMarks([els.tg_stem, els.tg_attr, els.tg_pos, els.dz_branch, els.dz_main, els.dz_mid, els.dz_rem]);
+
+  const done = total - bank.length;
+  setProgress(done, total);
+
+  if (mode === "tiangan") {
+    els.tianganPanel.style.display = "block";
+    els.dizhiPanel.style.display = "none";
+    els.doneScreen.classList.remove("show");
+
+    const data = TIANGAN_DATA[current.idx];
+    const mapping = { stem: els.tg_stem, attr: els.tg_attr, pos: els.tg_pos };
+    const inputs = [els.tg_stem, els.tg_attr, els.tg_pos];
+
+    for (const key of ["stem", "attr", "pos"]) {
+      const input = mapping[key];
+      const isGiven = key === current.showKey;
+      input.disabled = isGiven;
+      input.value = isGiven ? data[key] : "";
+    }
+
+    setStatus("請填寫其餘兩項；全對後 1 秒自動下一題。");
+    focusFirstEditable(inputs);
+    return;
+  }
+
+  // mode === "dizhi"
+  els.tianganPanel.style.display = "none";
+  els.dizhiPanel.style.display = "block";
+  els.doneScreen.classList.remove("show");
+
+  const data = DIZHI_DATA[current.idx];
+  els.dz_branch.disabled = true;
+  els.dz_branch.value = data.branch;
+  els.dz_main.disabled = false;
+  els.dz_mid.disabled = false;
+  els.dz_rem.disabled = false;
+  els.dz_main.value = "";
+  els.dz_mid.value = "";
+  els.dz_rem.value = "";
+
+  setStatus("請填寫主氣／中氣／餘氣；全對後 1 秒自動下一題。");
+  focusFirstEditable([els.dz_main, els.dz_mid, els.dz_rem]);
+}
+
+function finishMode() {
+  setProgress(total, total);
+  els.skipBtn.disabled = true;
+  els.doneScreen.classList.add("show");
+  els.tianganPanel.style.display = "none";
+  els.dizhiPanel.style.display = "none";
+  setStatus(`<span class="okText">完成</span>：本模式題目已全部作答。`);
+  els.doneText.textContent =
+    mode === "tiangan"
+      ? "你已完成「天干臨官位」全部 30 題。"
+      : "你已完成「地支藏干」全部 12 題。";
 }
 
 function nextQuestion() {
-  if (remainingQuestions.length === 0) {
-    clearMarks();
-    locked = false;
-    setProgress();
-    updateStatsDisplay();
-    const total = answeredCount;
-    const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-    const totalSeconds = totalAnswerMs / 1000;
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = Math.round(totalSeconds % 60);
-    const secStr = String(seconds).padStart(2, "0");
-    setStatus(
-      `<span class="okText">恭喜完成 60 題！</span><br>` +
-      `正確率：${accuracy}%　｜　總時間：${minutes}:${secStr}<br>` +
-      `可按「進度歸 0」重新開始一輪。`
-    );
-    els.checkBtn.disabled = true;
-    els.nextBtn.disabled = true;
-    els.revealBtn.disabled = true;
-    els.resetBtn.disabled = true;
+  if (bank.length === 0) return finishMode();
+  current = bank.pop();
+  renderQuestion();
+}
+
+function startMode(nextMode) {
+  mode = nextMode;
+  els.skipBtn.disabled = false;
+  showQuiz();
+
+  if (mode === "tiangan") {
+    bank = shuffleInPlace(buildTianganBank());
+    total = bank.length;
+    nextQuestion();
     return;
   }
 
-  currentQuestion = remainingQuestions.pop(); // 出過就移除，不再重複
-  currentRow = DATA[currentQuestion.rowIndex];
-  setGivenField(currentQuestion.givenFieldKey);
-  setProgress();
-  fillInputsForNewQuestion();
+  bank = shuffleInPlace(buildDizhiBank());
+  total = bank.length;
+  nextQuestion();
 }
 
-function getUserAnswers() {
-  const out = {};
-  for (const f of FIELDS) out[f.key] = els[f.key].value;
-  return out;
-}
-
-function checkAnswer() {
-  if (locked) return;
-  if (!currentRow || !givenFieldKey) nextQuestion();
-
-  clearMarks();
-
-  // 記錄作答時間與統計
-  const now = performance.now();
-  if (questionStartTime != null) {
-    totalAnswerMs += now - questionStartTime;
-    answeredCount += 1;
-    questionStartTime = null;
-  }
-
-  const user = getUserAnswers();
-  const correct = currentRow;
-
-  let allCorrect = true;
-  const wrongKeys = [];
-
-  for (const f of FIELDS) {
-    const input = els[f.key];
-    const isGiven = input.disabled;
-    if (isGiven) {
-      input.classList.add("okInput");
-      continue;
-    }
-    let ok;
-    if (f.key === "month") {
-      ok = normalizeMonth(user[f.key]) === normalizeMonth(correct[f.key]);
-    } else if (f.key === "branchMonth") {
-      ok = normalizeBranchMonth(user[f.key]) === normalizeBranchMonth(correct[f.key]);
-    } else {
-      ok = normalize(user[f.key]) === normalize(correct[f.key]);
-    }
-    if (ok) {
-      input.classList.add("okInput");
-    } else {
-      input.classList.add("badInput");
-      allCorrect = false;
-      wrongKeys.push(f.key);
-    }
-  }
-
-  if (allCorrect) {
-    correctCount += 1;
-    updateStatsDisplay();
-    locked = true;
-    setStatus(`<span class="okText">正確</span>（50ms 後自動下一題）`);
-    window.setTimeout(() => {
-      nextQuestion();
-    }, 50);
-    return;
-  }
-
-  const correctLine = `正解：${correct.month}／${correct.branchMonth}／${correct.jie}／${correct.qi}／${correct.season}`;
-  const wrongLabels = wrongKeys
-    .map(k => FIELDS.find(f => f.key === k)?.label ?? k)
-    .join("、");
-
-  wrongCount += 1;
-  updateStatsDisplay();
-
-  setStatus(
-    `<span class="badText">錯誤</span>（錯在：${wrongLabels}）<br>${correctLine}<br>請按「下一題」繼續。`
-  );
-}
-
-function revealAnswer() {
-  if (!currentRow) return;
-  const c = currentRow;
-  setStatus(
-    `本題正解：${c.month}／${c.branchMonth}／${c.jie}／${c.qi}／${c.season}`
-  );
-}
-
-function wireEvents() {
-  els.checkBtn.addEventListener("click", checkAnswer);
-  els.nextBtn.addEventListener("click", () => nextQuestion());
-  els.revealBtn.addEventListener("click", revealAnswer);
-  // 重新隨機：本版等同「下一題」（但仍不重複）
-  els.resetBtn.addEventListener("click", () => nextQuestion());
-  els.resetProgressBtn.addEventListener("click", resetProgress);
-
-  // Enter 直接核對（Shift+Enter 不做事）
-  for (const f of FIELDS) {
-    els[f.key].addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
+function wireLiveValidation(inputs) {
+  for (const i of inputs) {
+    i.addEventListener("input", () => validateAndMaybeAdvance());
+    i.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
         e.preventDefault();
-        checkAnswer();
+        validateAndMaybeAdvance();
       }
     });
   }
 }
 
+function wireEvents() {
+  els.startTiangan.addEventListener("click", () => startMode("tiangan"));
+  els.startDizhi.addEventListener("click", () => startMode("dizhi"));
+
+  els.backBtn.addEventListener("click", () => showMenu());
+  els.doneBackBtn.addEventListener("click", () => showMenu());
+
+  els.skipBtn.addEventListener("click", () => {
+    if (!mode) return;
+    nextQuestion();
+  });
+
+  wireLiveValidation([els.tg_stem, els.tg_attr, els.tg_pos, els.dz_main, els.dz_mid, els.dz_rem]);
+}
+
 wireEvents();
-resetProgress();
+showMenu();
 

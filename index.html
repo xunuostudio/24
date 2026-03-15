@@ -3,20 +3,19 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>24 節氣與地支月抽考工具</title>
+    <title>節氣／天干臨官位／地支藏干 抽考工具</title>
     <style>
       :root{
         --bg:#f7f7f8;
         --card:#ffffff;
-        --text:#1f2328;
+        --text:#111827;
         --muted:#6b7280;
         --border:#e5e7eb;
-        --focus:#111827;
+        --shadow: 0 10px 30px rgba(0,0,0,.06);
+        --radius: 16px;
         --ok:#15803d;
         --bad:#b91c1c;
-        --shadow: 0 10px 30px rgba(0,0,0,.06);
-        --radius: 14px;
-        --space: 16px;
+        --focus: rgba(17,24,39,.10);
       }
       *{ box-sizing:border-box; }
       body{
@@ -26,69 +25,52 @@
         color:var(--text);
       }
       .wrap{
-        max-width: 920px;
+        max-width: 980px;
         margin: 0 auto;
-        padding: 18px;
+        padding: 22px 18px 40px;
       }
       header{
         display:flex;
         align-items:flex-end;
         justify-content:space-between;
-        gap: 12px;
-        margin-bottom: 14px;
+        gap: 16px;
+        margin-bottom: 16px;
       }
       h1{
-        font-size: 18px;
-        line-height: 1.2;
-        margin: 0;
-        font-weight: 700;
+        margin:0;
+        font-size: 22px;
+        font-weight: 800;
         letter-spacing: .5px;
       }
-      .hint{
-        margin:0;
+      .sub{
+        margin: 6px 0 0;
         color: var(--muted);
-        font-size: 12px;
-        line-height: 1.4;
-        text-align:right;
-        max-width: 380px;
+        font-size: 13px;
+        line-height: 1.45;
       }
       .card{
         background:var(--card);
         border:1px solid var(--border);
         border-radius: var(--radius);
         box-shadow: var(--shadow);
-        padding: 16px;
+        padding: 18px;
       }
-      .legend{
-        display:flex;
-        flex-wrap:wrap;
-        gap: 8px 10px;
-        padding: 10px 12px;
-        border: 1px dashed var(--border);
-        border-radius: 12px;
-        color: var(--muted);
-        font-size: 12px;
-        margin-bottom: 14px;
-      }
-      .topRow{
+      .topbar{
         display:flex;
         align-items:center;
         justify-content:space-between;
         gap: 12px;
-        margin-bottom: 12px;
+        margin-bottom: 14px;
       }
-      .progressWrap{
-        flex: 1;
-        min-width: 240px;
-      }
+      .progressWrap{ flex: 1; }
       .progressText{
-        font-size: 12px;
+        margin: 0 0 8px;
+        font-size: 13px;
         color: var(--muted);
-        margin: 0 0 6px 0;
       }
       .progressTrack{
-        width:100%;
-        height: 10px;
+        width: 100%;
+        height: 12px;
         border-radius: 999px;
         background: #f1f5f9;
         border: 1px solid var(--border);
@@ -99,79 +81,6 @@
         width: 0%;
         background: #111827;
       }
-      .pill{
-        display:inline-flex;
-        align-items:center;
-        gap:8px;
-        padding: 6px 10px;
-        border-radius: 999px;
-        background: #fafafa;
-        border: 1px solid var(--border);
-      }
-      .dot{
-        width: 8px;
-        height: 8px;
-        border-radius: 999px;
-        background: var(--muted);
-        opacity: .7;
-      }
-      .grid{
-        display:grid;
-        grid-template-columns: repeat(2, minmax(0,1fr));
-        gap: 12px;
-      }
-      @media (max-width: 640px){
-        header{ align-items:flex-start; flex-direction:column; }
-        .hint{ text-align:left; max-width:none; }
-        .grid{ grid-template-columns: 1fr; }
-      }
-      .field{
-        display:flex;
-        flex-direction:column;
-        gap: 6px;
-      }
-      .labelRow{
-        display:flex;
-        align-items:baseline;
-        justify-content:space-between;
-        gap: 10px;
-      }
-      label{
-        font-size: 13px;
-        font-weight: 650;
-      }
-      .sub{
-        font-size: 12px;
-        color: var(--muted);
-      }
-      input{
-        width:100%;
-        padding: 12px 12px;
-        border-radius: 12px;
-        border: 1px solid var(--border);
-        background: #fff;
-        font-size: 16px;
-        outline: none;
-        transition: border-color .12s ease, box-shadow .12s ease, background-color .12s ease;
-      }
-      input:focus{
-        border-color: rgba(17,24,39,.55);
-        box-shadow: 0 0 0 3px rgba(17,24,39,.10);
-      }
-      input[disabled]{
-        background: #f3f4f6;
-        color: #111827;
-        cursor: not-allowed;
-      }
-      .row2{
-        grid-column: 1 / -1;
-      }
-      .actions{
-        display:flex;
-        flex-wrap:wrap;
-        gap: 10px;
-        margin-top: 14px;
-      }
       button{
         appearance:none;
         border: 1px solid var(--border);
@@ -179,51 +88,185 @@
         color: var(--text);
         padding: 10px 14px;
         border-radius: 12px;
-        font-weight: 650;
+        font-weight: 750;
         cursor: pointer;
-        transition: transform .05s ease, background-color .12s ease, border-color .12s ease;
       }
-      button:active{ transform: translateY(1px); }
       button.primary{
         border-color: rgba(17,24,39,.35);
         background: #111827;
         color: #fff;
       }
-      button[disabled]{
-        opacity: .55;
+      button:active{ transform: translateY(1px); }
+      button[disabled]{ opacity:.55; cursor:not-allowed; }
+
+      .menu{
+        display:grid;
+        grid-template-columns: repeat(2, minmax(0,1fr));
+        gap: 12px;
+      }
+      .menu.three{
+        grid-template-columns: repeat(3, minmax(0,1fr));
+      }
+      .menu.four{
+        grid-template-columns: repeat(2, minmax(0,1fr));
+      }
+      .menuBtn{
+        text-align:left;
+        padding: 16px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #fff;
+      }
+      .menuTitle{
+        font-size: 16px;
+        font-weight: 850;
+        margin: 0 0 6px;
+      }
+      .menuDesc{
+        margin: 0;
+        color: var(--muted);
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .quiz{
+        display:none;
+      }
+      .quiz.show{ display:block; }
+
+      .grid{
+        display:grid;
+        grid-template-columns: repeat(3, minmax(0,1fr));
+        gap: 14px;
+        margin-top: 10px;
+      }
+      .grid.dizhi{ grid-template-columns: repeat(4, minmax(0,1fr)); }
+
+      .field{
+        display:flex;
+        flex-direction:column;
+        gap: 8px;
+      }
+      label{
+        font-size: 14px;
+        font-weight: 800;
+      }
+      .mini{
+        font-size: 12px;
+        color: var(--muted);
+        margin-top: -4px;
+      }
+      input{
+        width:100%;
+        padding: 14px 14px;
+        border-radius: 14px;
+        border: 1px solid var(--border);
+        background: #fff;
+        font-size: 22px;
+        font-weight: 750;
+        outline:none;
+        transition: border-color .12s ease, box-shadow .12s ease, background-color .12s ease;
+      }
+      input:focus{
+        box-shadow: 0 0 0 4px var(--focus);
+        border-color: rgba(17,24,39,.45);
+      }
+      input[disabled]{
+        background:#f3f4f6;
+        color:#111827;
         cursor:not-allowed;
       }
+      .okInput{
+        border-color: rgba(21,128,61,.60) !important;
+        box-shadow: 0 0 0 4px rgba(21,128,61,.10) !important;
+        background: rgba(21,128,61,.04) !important;
+      }
+      .badInput{
+        border-color: rgba(185,28,28,.60) !important;
+        box-shadow: 0 0 0 4px rgba(185,28,28,.10) !important;
+        background: rgba(185,28,28,.04) !important;
+      }
+
       .status{
-        margin-top: 12px;
-        padding: 10px 12px;
-        border-radius: 12px;
+        margin-top: 14px;
         border: 1px solid var(--border);
         background: #fafafa;
-        font-size: 13px;
-        line-height: 1.45;
+        border-radius: 14px;
+        padding: 12px 14px;
         color: var(--muted);
-        min-height: 44px;
+        font-size: 14px;
+        line-height: 1.5;
+        min-height: 50px;
         display:flex;
         align-items:center;
       }
-      .stats{
-        margin-top: 10px;
-        font-size: 12px;
+      .okText{ color: var(--ok); font-weight: 900; }
+      .badText{ color: var(--bad); font-weight: 900; }
+
+      .doneScreen{
+        display:none;
+        text-align:center;
+        padding: 26px 12px 10px;
+      }
+      .doneScreen.show{ display:block; }
+      .doneTitle{
+        margin: 0 0 10px;
+        font-size: 22px;
+        font-weight: 900;
+      }
+      .doneText{
+        margin: 0 0 16px;
         color: var(--muted);
-        line-height: 1.5;
+        font-size: 14px;
+        line-height: 1.6;
       }
-      .statsLine{
-        margin: 0;
+      table{
+        width: 100%;
+        border-collapse: collapse;
+        border: 1px solid var(--border);
+        border-radius: 14px;
+        overflow:hidden;
+        background:#fff;
       }
-      .okText{ color: var(--ok); font-weight: 750; }
-      .badText{ color: var(--bad); font-weight: 750; }
-      .okInput{
-        border-color: rgba(21,128,61,.55) !important;
-        box-shadow: 0 0 0 3px rgba(21,128,61,.10) !important;
+      th, td{
+        border-bottom: 1px solid var(--border);
+        padding: 10px 12px;
+        text-align:left;
+        font-size: 14px;
+        line-height: 1.4;
       }
-      .badInput{
-        border-color: rgba(185,28,28,.55) !important;
-        box-shadow: 0 0 0 3px rgba(185,28,28,.10) !important;
+      th{
+        background:#f8fafc;
+        font-weight: 900;
+      }
+      tr:last-child td{ border-bottom: none; }
+      .tablesView{
+        display:none;
+      }
+      .tablesView.show{ display:block; }
+      .sectionTitle{
+        margin: 4px 0 10px;
+        font-size: 16px;
+        font-weight: 900;
+      }
+      .sectionHint{
+        margin: -6px 0 12px;
+        color: var(--muted);
+        font-size: 13px;
+      }
+      .tableWrap{
+        margin-top: 14px;
+      }
+      .stats{ margin-top: 10px; font-size: 12px; color: var(--muted); line-height: 1.5; }
+      .statsLine{ margin: 0; }
+      .row2{ grid-column: 1 / -1; }
+
+      @media (max-width: 760px){
+        .menu, .menu.three, .menu.four{ grid-template-columns: 1fr; }
+        .grid{ grid-template-columns: 1fr; }
+        .grid.dizhi{ grid-template-columns: 1fr; }
+        input{ font-size: 20px; }
+        header{ align-items:flex-start; flex-direction:column; }
       }
     </style>
   </head>
@@ -231,94 +274,249 @@
     <div class="wrap">
       <header>
         <div>
-          <h1>24 節氣與地支月抽考工具</h1>
+          <h1>抽考工具</h1>
+          <p class="sub">單頁模式（SPA）。重新整理頁面會清空進度。</p>
         </div>
-        <p class="hint">
-          規則：每題會先給你 1 個欄位，其餘 4 個請自己填。<br/>
-          正確：顯示綠色並在 50ms 自動下一題；錯誤：顯示紅色與正解，需按「下一題」。
-        </p>
+        <div>
+          <button id="backBtn" type="button">返回主選單</button>
+        </div>
       </header>
 
       <div class="card">
-        <div class="topRow">
-          <div class="progressWrap" aria-label="進度">
-            <p class="progressText" id="progressText">進度：0 / 60</p>
-            <div class="progressTrack" role="progressbar" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0">
-              <div class="progressBar" id="progressBar"></div>
-            </div>
-          </div>
-          <div>
-            <button id="resetProgressBtn" type="button">進度歸 0</button>
-          </div>
-        </div>
-
-        <div class="legend" aria-label="出題重點">
-          <span class="pill"><span class="dot"></span>地支（月）</span>
-          <span class="pill"><span class="dot"></span>24 節氣（節 / 氣）</span>
-          <span class="pill"><span class="dot"></span>季節（你的 12 分法）</span>
-        </div>
-
-        <div class="grid">
-          <div class="field">
-            <div class="labelRow">
-              <label for="month">月份</label>
-              <span class="sub">例：1月</span>
-            </div>
-            <input id="month" autocomplete="off" inputmode="numeric" placeholder="請輸入…">
-          </div>
-
-          <div class="field">
-            <div class="labelRow">
-              <label for="branchMonth">地支月</label>
-              <span class="sub">例：丑月</span>
-            </div>
-            <input id="branchMonth" autocomplete="off" placeholder="請輸入…">
-          </div>
-
-          <div class="field">
-            <div class="labelRow">
-              <label for="jie">節（前半月）</label>
-              <span class="sub">例：小寒</span>
-            </div>
-            <input id="jie" autocomplete="off" placeholder="請輸入…">
-          </div>
-
-          <div class="field">
-            <div class="labelRow">
-              <label for="qi">氣（後半月）</label>
-              <span class="sub">例：大寒</span>
-            </div>
-            <input id="qi" autocomplete="off" placeholder="請輸入…">
-          </div>
-
-          <div class="field row2">
-            <div class="labelRow">
-              <label for="season">季節</label>
-              <span class="sub">初春、春、春末、初夏、夏、夏末、初秋、秋、秋末、初冬、冬、冬末</span>
-            </div>
-            <input id="season" autocomplete="off" placeholder="請輸入…">
+        <div id="menuView">
+          <div class="menu four">
+            <button class="menuBtn" id="startJieqi" type="button">
+              <p class="menuTitle">24 節氣與地支月</p>
+              <p class="menuDesc">60 題（12 月 × 5 欄位）。不重複隨機抽題。正確率與計時。</p>
+            </button>
+            <button class="menuBtn" id="startTiangan" type="button">
+              <p class="menuTitle">天干臨官位</p>
+              <p class="menuDesc">題庫：10 天干 × 3 種出題角度 = 30 題。不重複隨機抽題。</p>
+            </button>
+            <button class="menuBtn" id="startDizhi" type="button">
+              <p class="menuTitle">地支藏干</p>
+              <p class="menuDesc">24 題（由支填氣、由氣填支各 12 題）。不重複隨機抽題。無中/餘氣以「-」作答。</p>
+            </button>
+            <button class="menuBtn" id="showTables" type="button">
+              <p class="menuTitle">資料表（查看）</p>
+              <p class="menuDesc">列出天干臨官位與地支藏干完整對照表。</p>
+            </button>
           </div>
         </div>
 
-        <div class="actions">
-          <button class="primary" id="checkBtn" type="button">核對</button>
-          <button id="nextBtn" type="button">下一題</button>
-          <button id="revealBtn" type="button">顯示本題正解</button>
-          <button id="resetBtn" type="button">重新隨機（不重複）</button>
+        <div id="tablesView" class="tablesView">
+          <div class="tableWrap">
+            <div class="sectionTitle">天干臨官位</div>
+            <div class="sectionHint">欄位：天干、臨官位（祿）、長生位、備註</div>
+            <table aria-label="天干臨官位表">
+              <thead>
+                <tr>
+                  <th>天干</th>
+                  <th>臨官位（祿）</th>
+                  <th>長生位</th>
+                  <th>備註</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>甲木</td><td>寅</td><td>-</td><td></td></tr>
+                <tr><td>乙木</td><td>卯</td><td>-</td><td></td></tr>
+                <tr><td>丙火</td><td>巳</td><td>-</td><td></td></tr>
+                <tr><td>丁火</td><td>午</td><td>-</td><td></td></tr>
+                <tr><td>戊土</td><td>巳</td><td>寅</td><td>老師強調的能量根基</td></tr>
+                <tr><td>己土</td><td>午</td><td>酉</td><td>老師強調的能量根基</td></tr>
+                <tr><td>庚金</td><td>申</td><td>-</td><td></td></tr>
+                <tr><td>辛金</td><td>酉</td><td>-</td><td></td></tr>
+                <tr><td>壬水</td><td>亥</td><td>-</td><td></td></tr>
+                <tr><td>癸水</td><td>子</td><td>-</td><td></td></tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="tableWrap">
+            <div class="sectionTitle">地支藏干</div>
+            <div class="sectionHint">欄位：地支、本氣（主氣）、中氣、餘氣</div>
+            <table aria-label="地支藏干表">
+              <thead>
+                <tr>
+                  <th>地支</th>
+                  <th>本氣（主氣）</th>
+                  <th>中氣</th>
+                  <th>餘氣</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr><td>子</td><td>癸水</td><td>-</td><td>-</td></tr>
+                <tr><td>丑</td><td>己土</td><td>癸水</td><td>辛金</td></tr>
+                <tr><td>寅</td><td>甲木</td><td>丙火</td><td>戊土</td></tr>
+                <tr><td>卯</td><td>乙木</td><td>-</td><td>-</td></tr>
+                <tr><td>辰</td><td>戊土</td><td>乙木</td><td>癸水</td></tr>
+                <tr><td>巳</td><td>丙火</td><td>庚金</td><td>戊土</td></tr>
+                <tr><td>午</td><td>丁火</td><td>己土</td><td>-</td></tr>
+                <tr><td>未</td><td>己土</td><td>丁火</td><td>乙木</td></tr>
+                <tr><td>申</td><td>庚金</td><td>壬水</td><td>戊土</td></tr>
+                <tr><td>酉</td><td>辛金</td><td>-</td><td>-</td></tr>
+                <tr><td>戌</td><td>戊土</td><td>辛金</td><td>丁火</td></tr>
+                <tr><td>亥</td><td>壬水</td><td>甲木</td><td>-</td></tr>
+              </tbody>
+            </table>
+          </div>
         </div>
 
-        <div class="status" id="status" role="status" aria-live="polite"></div>
-        <div class="stats">
-          <p class="statsLine" id="statsLine1">答對：0 題　｜　答錯：0 題　｜　正確率：0%</p>
-          <p class="statsLine" id="statsLine2">總答題時間：0:00（平均 0 秒 / 題）</p>
+        <div id="quizView" class="quiz">
+          <div class="topbar">
+            <div class="progressWrap">
+              <p class="progressText" id="progressText">進度：0/0</p>
+              <div class="progressTrack" role="progressbar" aria-valuemin="0" aria-valuemax="0" aria-valuenow="0">
+                <div class="progressBar" id="progressBar"></div>
+              </div>
+            </div>
+            <div>
+              <button class="primary" id="skipBtn" type="button">換下一題</button>
+            </div>
+          </div>
+
+          <div id="jieqiPanel" style="display:none;">
+            <div class="grid" style="grid-template-columns: repeat(2, minmax(0,1fr));">
+              <div class="field">
+                <label for="jq_month">月份</label>
+                <input id="jq_month" autocomplete="off" inputmode="numeric" placeholder="例：1 或 1月" />
+              </div>
+              <div class="field">
+                <label for="jq_branchMonth">地支月</label>
+                <input id="jq_branchMonth" autocomplete="off" placeholder="例：丑 或 丑月" />
+              </div>
+              <div class="field">
+                <label for="jq_jie">節（前半月）</label>
+                <input id="jq_jie" autocomplete="off" placeholder="例：小寒" />
+              </div>
+              <div class="field">
+                <label for="jq_qi">氣（後半月）</label>
+                <input id="jq_qi" autocomplete="off" placeholder="例：大寒" />
+              </div>
+              <div class="field row2">
+                <label for="jq_season">季節</label>
+                <input id="jq_season" autocomplete="off" placeholder="初春、春、春末、初夏、夏、夏末、初秋、秋、秋末、初冬、冬、冬末" />
+              </div>
+            </div>
+            <div class="actions" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:14px;">
+              <button class="primary" id="jq_checkBtn" type="button">核對</button>
+              <button id="jq_nextBtn" type="button">下一題</button>
+              <button id="jq_revealBtn" type="button">顯示本題正解</button>
+              <button id="jq_resetProgressBtn" type="button">進度歸 0</button>
+            </div>
+            <div class="stats">
+              <p class="statsLine" id="jq_statsLine1">答對：0 題　｜　答錯：0 題　｜　正確率：0%</p>
+              <p class="statsLine" id="jq_statsLine2">總答題時間：0:00（平均 0 秒 / 題）</p>
+            </div>
+          </div>
+
+          <div id="tianganPanel" style="display:none;">
+            <div class="grid">
+              <div class="field">
+                <label for="tg_stem">天干</label>
+                <input id="tg_stem" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="tg_attr">屬性</label>
+                <input id="tg_attr" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="tg_pos">臨官位</label>
+                <input id="tg_pos" autocomplete="off" />
+              </div>
+            </div>
+          </div>
+
+          <div id="dizhiPanel" style="display:none;">
+            <div class="grid dizhi">
+              <div class="field">
+                <label for="dz_branch">地支</label>
+                <input id="dz_branch" autocomplete="off" />
+              </div>
+              <div class="field">
+                <label for="dz_main">主氣</label>
+                <input id="dz_main" autocomplete="off" />
+                <div class="mini">主氣</div>
+              </div>
+              <div class="field">
+                <label for="dz_mid">中氣</label>
+                <input id="dz_mid" autocomplete="off" />
+                <div class="mini">中氣（無則輸入 -）</div>
+              </div>
+              <div class="field">
+                <label for="dz_rem">餘氣</label>
+                <input id="dz_rem" autocomplete="off" />
+                <div class="mini">餘氣（無則輸入 -）</div>
+              </div>
+            </div>
+          </div>
+
+          <div id="dizhiReversePanel" style="display:none;">
+            <div class="grid dizhi">
+              <div class="field">
+                <label for="dz_rev_branch">地支</label>
+                <input id="dz_rev_branch" autocomplete="off" placeholder="請輸入對應地支" />
+                <div class="mini">依主氣、中氣、餘氣填寫地支</div>
+              </div>
+              <div class="field">
+                <label>主氣</label>
+                <input id="dz_rev_main" disabled />
+              </div>
+              <div class="field">
+                <label>中氣</label>
+                <input id="dz_rev_mid" disabled />
+              </div>
+              <div class="field">
+                <label>餘氣</label>
+                <input id="dz_rev_rem" disabled />
+              </div>
+            </div>
+          </div>
+
+          <div class="status" id="status" role="status" aria-live="polite"></div>
+
+          <div id="doneScreen" class="doneScreen" aria-live="polite">
+            <p class="doneTitle">恭喜完成！</p>
+            <p class="doneText" id="doneText">你已完成本模式所有題目。</p>
+            <button class="primary" id="doneBackBtn" type="button">回主選單</button>
+          </div>
         </div>
       </div>
     </div>
 
     <script>
-// 24 節氣與地支月抽考工具（內建資料 + 隨機出題）
+// 天干臨官位／地支藏干 抽考工具（SPA）
 
-const DATA = [
+const TIANGAN_DATA = [
+  { stem: "甲", attr: "陽木", pos: "寅" },
+  { stem: "乙", attr: "陰木", pos: "卯" },
+  { stem: "丙", attr: "陽火", pos: "巳" },
+  { stem: "丁", attr: "陰火", pos: "午" },
+  { stem: "戊", attr: "陽土", pos: "寅巳" },
+  { stem: "己", attr: "陰土", pos: "酉午" },
+  { stem: "庚", attr: "陽金", pos: "申" },
+  { stem: "辛", attr: "陰金", pos: "酉" },
+  { stem: "壬", attr: "陽水", pos: "亥" },
+  { stem: "癸", attr: "陰水", pos: "子" },
+];
+
+const DIZHI_DATA = [
+  { branch: "子", main: "癸水", mid: "-", rem: "-" },
+  { branch: "丑", main: "己土", mid: "癸水", rem: "辛金" },
+  { branch: "寅", main: "甲木", mid: "丙火", rem: "戊土" },
+  { branch: "卯", main: "乙木", mid: "-", rem: "-" },
+  { branch: "辰", main: "戊土", mid: "乙木", rem: "癸水" },
+  { branch: "巳", main: "丙火", mid: "庚金", rem: "戊土" },
+  { branch: "午", main: "丁火", mid: "己土", rem: "-" },
+  { branch: "未", main: "己土", mid: "丁火", rem: "乙木" },
+  { branch: "申", main: "庚金", mid: "壬水", rem: "戊土" },
+  { branch: "酉", main: "辛金", mid: "-", rem: "-" },
+  { branch: "戌", main: "戊土", mid: "辛金", rem: "丁火" },
+  { branch: "亥", main: "壬水", mid: "甲木", rem: "-" },
+];
+
+// ---------- 24 節氣與地支月（節氣）----------
+const JIEQI_DATA = [
   { month: "1月", branchMonth: "丑月", jie: "小寒", qi: "大寒", season: "冬末" },
   { month: "2月", branchMonth: "寅月", jie: "立春", qi: "雨水", season: "初春" },
   { month: "3月", branchMonth: "卯月", jie: "驚蟄", qi: "春分", season: "春" },
@@ -332,72 +530,223 @@ const DATA = [
   { month: "11月", branchMonth: "亥月", jie: "立冬", qi: "小雪", season: "初冬" },
   { month: "12月", branchMonth: "子月", jie: "大雪", qi: "冬至", season: "冬" },
 ];
-
-// 5 個欄位（共 12*5=60 個資料格）
-const FIELDS = [
+const JIEQI_FIELDS = [
   { key: "month", label: "月份" },
   { key: "branchMonth", label: "地支月" },
   { key: "jie", label: "節（前半月）" },
   { key: "qi", label: "氣（後半月）" },
   { key: "season", label: "季節" },
 ];
-
-const els = {
-  month: document.getElementById("month"),
-  branchMonth: document.getElementById("branchMonth"),
-  jie: document.getElementById("jie"),
-  qi: document.getElementById("qi"),
-  season: document.getElementById("season"),
-  status: document.getElementById("status"),
-  progressText: document.getElementById("progressText"),
-  progressBar: document.getElementById("progressBar"),
-  statsLine1: document.getElementById("statsLine1"),
-  statsLine2: document.getElementById("statsLine2"),
-  checkBtn: document.getElementById("checkBtn"),
-  nextBtn: document.getElementById("nextBtn"),
-  revealBtn: document.getElementById("revealBtn"),
-  resetBtn: document.getElementById("resetBtn"),
-  resetProgressBtn: document.getElementById("resetProgressBtn"),
+const JIEQI_TOTAL = JIEQI_DATA.length * JIEQI_FIELDS.length;
+const jqEls = {
+  month: document.getElementById("jq_month"),
+  branchMonth: document.getElementById("jq_branchMonth"),
+  jie: document.getElementById("jq_jie"),
+  qi: document.getElementById("jq_qi"),
+  season: document.getElementById("jq_season"),
+  statsLine1: document.getElementById("jq_statsLine1"),
+  statsLine2: document.getElementById("jq_statsLine2"),
+  checkBtn: document.getElementById("jq_checkBtn"),
+  nextBtn: document.getElementById("jq_nextBtn"),
+  revealBtn: document.getElementById("jq_revealBtn"),
+  resetProgressBtn: document.getElementById("jq_resetProgressBtn"),
 };
-
-// 題庫：12 個月份 × 5 個欄位 = 60 題（出過不重複）
-const TOTAL_QUESTIONS = DATA.length * FIELDS.length;
-let remainingQuestions = [];
-let currentQuestion = null; // { rowIndex, givenFieldKey }
-let currentRow = null;      // DATA[currentQuestion.rowIndex]
-let givenFieldKey = null;   // currentQuestion.givenFieldKey
-let locked = false;         // 防止答對自動跳題時重複觸發
-let correctCount = 0;
-let wrongCount = 0;
-let answeredCount = 0;
-let totalAnswerMs = 0;
-let questionStartTime = null;
-
-function normalize(s) {
-  return (s ?? "")
-    .toString()
-    .replace(/\s+/g, "")
-    .replace(/[　]/g, "")
-    .trim();
-}
+let jqRemaining = [];
+let jqCurrentRow = null;
+let jqGivenFieldKey = null;
+let jqLocked = false;
+let jqCorrectCount = 0, jqWrongCount = 0, jqAnsweredCount = 0, jqTotalAnswerMs = 0, jqQuestionStartTime = null;
 
 function normalizeMonth(s) {
-  // 只比對阿拉伯數字：1,2,...,12；忽略「月」與其他字元
-  return (s ?? "")
-    .toString()
-    .replace(/[^\d]/g, "")
-    .trim();
+  return (s ?? "").toString().replace(/[^\d]/g, "").replace(/\s+/g, "").trim();
+}
+function normalizeBranchMonth(s) {
+  return (s ?? "").toString().replace(/月/g, "").replace(/\s+/g, "").replace(/[　]/g, "").trim();
+}
+function jqClearMarks() {
+  for (const f of JIEQI_FIELDS) {
+    const el = jqEls[f.key];
+    if (el) el.classList.remove("okInput", "badInput");
+  }
+}
+function jqUpdateStats() {
+  const total = jqAnsweredCount;
+  const accuracy = total > 0 ? Math.round((jqCorrectCount / total) * 100) : 0;
+  const sec = jqTotalAnswerMs / 1000;
+  const m = Math.floor(sec / 60), s = Math.round(sec % 60);
+  const avg = total > 0 ? (sec / total) : 0;
+  if (jqEls.statsLine1) jqEls.statsLine1.textContent = `答對：${jqCorrectCount} 題　｜　答錯：${jqWrongCount} 題　｜　正確率：${accuracy}%`;
+  if (jqEls.statsLine2) jqEls.statsLine2.textContent = `總答題時間：${m}:${String(s).padStart(2,"0")}（平均 ${avg.toFixed(1).replace(/\.0$/,"")} 秒 / 題）`;
+}
+function jqSetProgress() {
+  const done = JIEQI_TOTAL - jqRemaining.length;
+  els.progressText.textContent = `進度：${done} / ${JIEQI_TOTAL}`;
+  els.progressBar.style.width = `${(done / JIEQI_TOTAL) * 100}%`;
+  if (els.progressTrack) els.progressTrack.setAttribute("aria-valuenow", String(done));
+}
+function jqSetGivenField(key) {
+  jqGivenFieldKey = key;
+  for (const f of JIEQI_FIELDS) {
+    const el = jqEls[f.key];
+    if (el) el.disabled = f.key === key;
+  }
+}
+function jqFillInputs() {
+  jqClearMarks();
+  jqLocked = false;
+  setStatus("請輸入其餘 4 個欄位，完成後按「核對」。");
+  jqQuestionStartTime = performance.now();
+  for (const f of JIEQI_FIELDS) {
+    const el = jqEls[f.key];
+    if (!el) continue;
+    if (f.key === jqGivenFieldKey) el.value = jqCurrentRow[f.key];
+    else el.value = "";
+  }
+  const first = JIEQI_FIELDS.map(f => jqEls[f.key]).find(i => i && !i.disabled);
+  if (first) first.focus();
+}
+function jqBuildBank() {
+  const q = [];
+  for (let ri = 0; ri < JIEQI_DATA.length; ri++)
+    for (const f of JIEQI_FIELDS) q.push({ rowIndex: ri, givenFieldKey: f.key });
+  return q;
+}
+function jqResetProgress() {
+  jqRemaining = shuffleInPlace(jqBuildBank());
+  jqCurrentRow = null;
+  jqGivenFieldKey = null;
+  jqCorrectCount = 0;
+  jqWrongCount = 0;
+  jqAnsweredCount = 0;
+  jqTotalAnswerMs = 0;
+  jqQuestionStartTime = null;
+  if (jqEls.checkBtn) jqEls.checkBtn.disabled = false;
+  if (jqEls.nextBtn) jqEls.nextBtn.disabled = false;
+  if (jqEls.revealBtn) jqEls.revealBtn.disabled = false;
+  jqSetProgress();
+  jqUpdateStats();
+  jqNextQuestion();
+}
+function jqNextQuestion() {
+  if (jqRemaining.length === 0) {
+    jqClearMarks();
+    jqSetProgress();
+    jqUpdateStats();
+    const total = jqAnsweredCount;
+    const accuracy = total > 0 ? Math.round((jqCorrectCount / total) * 100) : 0;
+    const sec = jqTotalAnswerMs / 1000;
+    const m = Math.floor(sec / 60), s = Math.round(sec % 60);
+    setStatus(`<span class="okText">恭喜完成 60 題！</span><br>正確率：${accuracy}%　｜　總時間：${m}:${String(s).padStart(2,"0")}<br>可按「進度歸 0」重新開始。`);
+    if (jqEls.checkBtn) jqEls.checkBtn.disabled = true;
+    if (jqEls.nextBtn) jqEls.nextBtn.disabled = true;
+    if (jqEls.revealBtn) jqEls.revealBtn.disabled = true;
+    return;
+  }
+  const item = jqRemaining.pop();
+  jqCurrentRow = JIEQI_DATA[item.rowIndex];
+  jqSetGivenField(item.givenFieldKey);
+  jqSetProgress();
+  jqFillInputs();
+}
+function jqGetAnswers() {
+  const o = {};
+  for (const f of JIEQI_FIELDS) o[f.key] = jqEls[f.key] ? jqEls[f.key].value : "";
+  return o;
+}
+function jqCheckAnswer() {
+  if (jqLocked) return;
+  if (!jqCurrentRow || !jqGivenFieldKey) return jqNextQuestion();
+  jqClearMarks();
+  const now = performance.now();
+  if (jqQuestionStartTime != null) {
+    jqTotalAnswerMs += now - jqQuestionStartTime;
+    jqAnsweredCount += 1;
+    jqQuestionStartTime = null;
+  }
+  const user = jqGetAnswers();
+  const correct = jqCurrentRow;
+  let allOk = true;
+  const wrongKeys = [];
+  for (const f of JIEQI_FIELDS) {
+    const el = jqEls[f.key];
+    if (!el) continue;
+    if (el.disabled) { el.classList.add("okInput"); continue; }
+    let ok;
+    if (f.key === "month") ok = normalizeMonth(user[f.key]) === normalizeMonth(correct[f.key]);
+    else if (f.key === "branchMonth") ok = normalizeBranchMonth(user[f.key]) === normalizeBranchMonth(correct[f.key]);
+    else ok = normalize(user[f.key]) === normalize(correct[f.key]);
+    if (ok) el.classList.add("okInput");
+    else { el.classList.add("badInput"); allOk = false; wrongKeys.push(f.key); }
+  }
+  if (allOk) {
+    jqCorrectCount += 1;
+    jqUpdateStats();
+    jqLocked = true;
+    setStatus(`<span class="okText">正確</span>（1 秒後自動下一題）`);
+    setTimeout(jqNextQuestion, 1000);
+    return;
+  }
+  jqWrongCount += 1;
+  jqUpdateStats();
+  const wrongLabels = wrongKeys.map(k => JIEQI_FIELDS.find(f => f.key === k)?.label ?? k).join("、");
+  setStatus(`<span class="badText">錯誤</span>（錯在：${wrongLabels}）<br>正解：${correct.month}／${correct.branchMonth}／${correct.jie}／${correct.qi}／${correct.season}<br>請按「下一題」繼續。`);
+}
+function jqRevealAnswer() {
+  if (!jqCurrentRow) return;
+  const c = jqCurrentRow;
+  setStatus(`本題正解：${c.month}／${c.branchMonth}／${c.jie}／${c.qi}／${c.season}`);
+}
+function showJieqiQuiz() {
+  mode = "jieqi";
+  els.tianganPanel.style.display = "none";
+  els.dizhiPanel.style.display = "none";
+  els.dizhiReversePanel.style.display = "none";
+  els.jieqiPanel.style.display = "block";
+  els.doneScreen.classList.remove("show");
+  if (els.skipBtn) els.skipBtn.style.display = "none";
+  jqResetProgress();
 }
 
-function normalizeBranchMonth(s) {
-  // 比對地支：丑、寅...；忽略「月」與空白
-  return (s ?? "")
-    .toString()
-    .replace(/月/g, "")
-    .replace(/\s+/g, "")
-    .replace(/[　]/g, "")
-    .trim();
-}
+const els = {
+  menuView: document.getElementById("menuView"),
+  tablesView: document.getElementById("tablesView"),
+  quizView: document.getElementById("quizView"),
+  backBtn: document.getElementById("backBtn"),
+  startJieqi: document.getElementById("startJieqi"),
+  startTiangan: document.getElementById("startTiangan"),
+  startDizhi: document.getElementById("startDizhi"),
+  startDizhiReverse: document.getElementById("startDizhiReverse"),
+  showTables: document.getElementById("showTables"),
+
+  progressText: document.getElementById("progressText"),
+  progressBar: document.getElementById("progressBar"),
+  progressTrack: document.querySelector(".progressTrack[role='progressbar']"),
+
+  skipBtn: document.getElementById("skipBtn"),
+  status: document.getElementById("status"),
+
+  jieqiPanel: document.getElementById("jieqiPanel"),
+  tianganPanel: document.getElementById("tianganPanel"),
+  tg_stem: document.getElementById("tg_stem"),
+  tg_attr: document.getElementById("tg_attr"),
+  tg_pos: document.getElementById("tg_pos"),
+
+  dizhiPanel: document.getElementById("dizhiPanel"),
+  dz_branch: document.getElementById("dz_branch"),
+  dz_main: document.getElementById("dz_main"),
+  dz_mid: document.getElementById("dz_mid"),
+  dz_rem: document.getElementById("dz_rem"),
+
+  dizhiReversePanel: document.getElementById("dizhiReversePanel"),
+  dz_rev_branch: document.getElementById("dz_rev_branch"),
+  dz_rev_main: document.getElementById("dz_rev_main"),
+  dz_rev_mid: document.getElementById("dz_rev_mid"),
+  dz_rev_rem: document.getElementById("dz_rev_rem"),
+
+  doneScreen: document.getElementById("doneScreen"),
+  doneText: document.getElementById("doneText"),
+  doneBackBtn: document.getElementById("doneBackBtn"),
+};
 
 function shuffleInPlace(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -407,233 +756,335 @@ function shuffleInPlace(arr) {
   return arr;
 }
 
-function clearMarks() {
-  for (const f of FIELDS) {
-    const input = els[f.key];
-    input.classList.remove("okInput", "badInput");
-  }
+function normalize(s) {
+  return (s ?? "").toString().replace(/\s+/g, "").replace(/[　]/g, "").trim();
+}
+
+function normalizeDash(s) {
+  const t = normalize(s);
+  // 地支藏干：要求真的輸入「-」，空白不視為「-」
+  if (t === "-" || t === "－" || t === "—" || t === "–") return "-";
+  return t;
+}
+
+function normalizeBranch(s) {
+  // 地支：忽略「月」與空白，只比對地支字
+  return (s ?? "").toString().replace(/月/g, "").replace(/\s+/g, "").replace(/[　]/g, "").trim();
+}
+
+function clearMarks(inputs) {
+  for (const i of inputs) i.classList.remove("okInput", "badInput");
 }
 
 function setStatus(html) {
   els.status.innerHTML = html;
 }
 
-function updateStatsDisplay() {
-  const total = answeredCount;
-  const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-  const totalSeconds = totalAnswerMs / 1000;
-  const minutes = Math.floor(totalSeconds / 60);
-  const seconds = Math.round(totalSeconds % 60);
-  const avgSeconds = total > 0 ? (totalSeconds / total) : 0;
-
-  if (els.statsLine1) {
-    els.statsLine1.textContent = `答對：${correctCount} 題　｜　答錯：${wrongCount} 題　｜　正確率：${accuracy}%`;
-  }
-
-  if (els.statsLine2) {
-    const secStr = String(seconds).padStart(2, "0");
-    const avgStr = avgSeconds.toFixed(1).replace(/\.0$/, "");
-    els.statsLine2.textContent = `總答題時間：${minutes}:${secStr}（平均 ${avgStr} 秒 / 題）`;
-  }
+function setProgress(done, total) {
+  els.progressText.textContent = `進度：${done}/${total}`;
+  els.progressTrack?.setAttribute("aria-valuemin", "0");
+  els.progressTrack?.setAttribute("aria-valuemax", String(total));
+  els.progressTrack?.setAttribute("aria-valuenow", String(done));
+  const pct = total === 0 ? 0 : (done / total) * 100;
+  els.progressBar.style.width = `${pct}%`;
 }
 
-function setProgress() {
-  const doneNow = TOTAL_QUESTIONS - remainingQuestions.length;
-  if (els.progressText) els.progressText.textContent = `進度：${doneNow} / ${TOTAL_QUESTIONS}`;
-  if (els.progressBar) els.progressBar.style.width = `${(doneNow / TOTAL_QUESTIONS) * 100}%`;
-  const track = document.querySelector(".progressTrack[role='progressbar']");
-  if (track) track.setAttribute("aria-valuenow", String(doneNow));
+function showMenu() {
+  els.menuView.style.display = "block";
+  els.tablesView?.classList.remove("show");
+  els.quizView.classList.remove("show");
+  els.tianganPanel.style.display = "none";
+  els.jieqiPanel.style.display = "none";
+  els.dizhiPanel.style.display = "none";
+  els.dizhiReversePanel.style.display = "none";
+  els.doneScreen.classList.remove("show");
+  if (els.skipBtn) els.skipBtn.style.display = "";
+  setStatus("請選擇一個測驗模式。");
+  setProgress(0, 0);
 }
 
-function setGivenField(fieldKey) {
-  givenFieldKey = fieldKey;
-  for (const f of FIELDS) {
-    const input = els[f.key];
-    const isGiven = f.key === givenFieldKey;
-    input.disabled = isGiven;
-    input.dataset.given = isGiven ? "1" : "0";
-  }
+function showQuiz() {
+  els.menuView.style.display = "none";
+  els.tablesView?.classList.remove("show");
+  els.quizView.classList.add("show");
+  els.doneScreen.classList.remove("show");
 }
 
-function fillInputsForNewQuestion() {
-  clearMarks();
-  locked = false;
-  setStatus("請輸入其餘 4 個欄位，完成後按「核對」。");
-  questionStartTime = performance.now();
-
-  for (const f of FIELDS) {
-    const input = els[f.key];
-    if (f.key === givenFieldKey) {
-      input.value = currentRow[f.key];
-    } else {
-      input.value = "";
-    }
-  }
-
-  const firstEditable = FIELDS.map(f => els[f.key]).find(i => !i.disabled);
-  if (firstEditable) firstEditable.focus();
+function showTables() {
+  els.menuView.style.display = "none";
+  els.quizView.classList.remove("show");
+  els.doneScreen.classList.remove("show");
+  els.tianganPanel.style.display = "none";
+  els.dizhiPanel.style.display = "none";
+  els.tablesView?.classList.add("show");
+  setStatus("資料表模式：僅供查看。可按右上角返回主選單。");
+  setProgress(0, 0);
 }
 
-function buildQuestionBank() {
+let mode = null; // "tiangan" | "dizhi" | "dizhi_reverse"
+let bank = [];
+let total = 0;
+let current = null;
+let locked = false;
+
+function buildTianganBank() {
+  const keys = ["stem", "attr", "pos"];
   const q = [];
-  for (let rowIndex = 0; rowIndex < DATA.length; rowIndex++) {
-    for (const f of FIELDS) {
-      q.push({ rowIndex, givenFieldKey: f.key });
-    }
+  for (let i = 0; i < TIANGAN_DATA.length; i++) {
+    for (const showKey of keys) q.push({ idx: i, showKey });
   }
   return q;
 }
 
-function resetProgress() {
-  remainingQuestions = shuffleInPlace(buildQuestionBank());
-  currentQuestion = null;
-  currentRow = null;
-  givenFieldKey = null;
-  correctCount = 0;
-  wrongCount = 0;
-  answeredCount = 0;
-  totalAnswerMs = 0;
-  questionStartTime = null;
-  els.checkBtn.disabled = false;
-  els.nextBtn.disabled = false;
-  els.revealBtn.disabled = false;
-  els.resetBtn.disabled = false;
-  setProgress();
-  updateStatsDisplay();
-  nextQuestion();
+function buildDizhiBank() {
+  const q = [];
+  for (let i = 0; i < DIZHI_DATA.length; i++) {
+    q.push({ idx: i, type: "branch_to_qi" });
+    q.push({ idx: i, type: "qi_to_branch" });
+  }
+  return q;
+}
+
+function focusFirstEditable(panelInputs) {
+  const first = panelInputs.find(i => !i.disabled);
+  first?.focus();
+}
+
+function validateAndMaybeAdvance() {
+  if (!current || locked) return;
+
+  if (mode === "tiangan") {
+    const data = TIANGAN_DATA[current.idx];
+    const mapping = { stem: els.tg_stem, attr: els.tg_attr, pos: els.tg_pos };
+    const inputs = [els.tg_stem, els.tg_attr, els.tg_pos];
+
+    let allOk = true;
+    for (const key of ["stem", "attr", "pos"]) {
+      const input = mapping[key];
+      const isGiven = input.disabled;
+      if (isGiven) {
+        input.classList.add("okInput");
+        continue;
+      }
+      const ok = normalize(input.value) === normalize(data[key]);
+      input.classList.toggle("okInput", ok);
+      input.classList.toggle("badInput", !ok && normalize(input.value) !== "");
+      if (!ok) allOk = false;
+    }
+
+    if (allOk) {
+      locked = true;
+      setStatus(`<span class="okText">正確</span>（1 秒後自動下一題）`);
+      window.setTimeout(() => nextQuestion(), 1000);
+    } else {
+      setStatus("持續修正到全部正確後會自動跳題。");
+    }
+
+    for (const i of inputs) {
+      if (!i.disabled && normalize(i.value) === "") i.classList.remove("badInput");
+    }
+    return;
+  }
+
+  if (mode === "dizhi" && current.type === "qi_to_branch") {
+    const data = DIZHI_DATA[current.idx];
+    els.dz_rev_main.classList.add("okInput");
+    els.dz_rev_mid.classList.add("okInput");
+    els.dz_rev_rem.classList.add("okInput");
+    const ok = normalizeBranch(els.dz_rev_branch.value) === normalizeBranch(data.branch);
+    els.dz_rev_branch.classList.toggle("okInput", ok);
+    els.dz_rev_branch.classList.toggle("badInput", !ok);
+    if (ok) {
+      locked = true;
+      setStatus(`<span class="okText">正確</span>（1 秒後自動下一題）`);
+      window.setTimeout(() => nextQuestion(), 1000);
+    } else {
+      setStatus("請依主氣、中氣、餘氣填寫對應地支。");
+    }
+    return;
+  }
+
+  if (mode === "dizhi") {
+    const data = DIZHI_DATA[current.idx];
+
+  els.dz_branch.classList.add("okInput");
+
+  const checks = [
+    { input: els.dz_main, correct: data.main, normalizer: normalize },
+    { input: els.dz_mid, correct: data.mid, normalizer: normalizeDash },
+    { input: els.dz_rem, correct: data.rem, normalizer: normalizeDash },
+  ];
+
+  let allOk = true;
+  for (const c of checks) {
+    const user = c.normalizer(c.input.value);
+    const ok = user === c.normalizer(c.correct);
+    c.input.classList.toggle("okInput", ok);
+    // 空白也視為錯誤（因為無中氣/餘氣者仍需輸入 -）
+    c.input.classList.toggle("badInput", !ok);
+    if (!ok) allOk = false;
+  }
+
+  if (allOk) {
+    locked = true;
+    setStatus(`<span class="okText">正確</span>（1 秒後自動下一題）`);
+    window.setTimeout(() => nextQuestion(), 1000);
+  } else {
+    setStatus("提示：無中氣/餘氣者請輸入「-」。修正到全對會自動跳題。");
+  }
+  }
+}
+
+function renderQuestion() {
+  locked = false;
+  clearMarks([els.tg_stem, els.tg_attr, els.tg_pos, els.dz_branch, els.dz_main, els.dz_mid, els.dz_rem, els.dz_rev_branch, els.dz_rev_main, els.dz_rev_mid, els.dz_rev_rem]);
+
+  const done = total - bank.length;
+  setProgress(done, total);
+
+  if (mode === "tiangan") {
+    els.tianganPanel.style.display = "block";
+    els.jieqiPanel.style.display = "none";
+    els.dizhiPanel.style.display = "none";
+    els.dizhiReversePanel.style.display = "none";
+    els.doneScreen.classList.remove("show");
+
+    const data = TIANGAN_DATA[current.idx];
+    const mapping = { stem: els.tg_stem, attr: els.tg_attr, pos: els.tg_pos };
+    const inputs = [els.tg_stem, els.tg_attr, els.tg_pos];
+
+    for (const key of ["stem", "attr", "pos"]) {
+      const input = mapping[key];
+      const isGiven = key === current.showKey;
+      input.disabled = isGiven;
+      input.value = isGiven ? data[key] : "";
+    }
+
+    setStatus("請填寫其餘兩項；全對後 1 秒自動下一題。");
+    focusFirstEditable(inputs);
+    return;
+  }
+
+  if (mode === "dizhi" && current.type === "qi_to_branch") {
+    els.tianganPanel.style.display = "none";
+    els.jieqiPanel.style.display = "none";
+    els.dizhiPanel.style.display = "none";
+    els.dizhiReversePanel.style.display = "block";
+    els.doneScreen.classList.remove("show");
+
+    const data = DIZHI_DATA[current.idx];
+    els.dz_rev_main.value = data.main;
+    els.dz_rev_mid.value = data.mid;
+    els.dz_rev_rem.value = data.rem;
+    els.dz_rev_branch.value = "";
+    els.dz_rev_branch.disabled = false;
+
+    setStatus("請依主氣、中氣、餘氣填寫對應地支；正確後 1 秒自動下一題。");
+    els.dz_rev_branch.focus();
+    return;
+  }
+
+  els.tianganPanel.style.display = "none";
+  els.jieqiPanel.style.display = "none";
+  els.dizhiPanel.style.display = "block";
+  els.dizhiReversePanel.style.display = "none";
+  els.doneScreen.classList.remove("show");
+
+  const data = DIZHI_DATA[current.idx];
+  els.dz_branch.disabled = true;
+  els.dz_branch.value = data.branch;
+  els.dz_main.disabled = false;
+  els.dz_mid.disabled = false;
+  els.dz_rem.disabled = false;
+  els.dz_main.value = "";
+  els.dz_mid.value = "";
+  els.dz_rem.value = "";
+
+  setStatus("請填寫主氣／中氣／餘氣；全對後 1 秒自動下一題。");
+  focusFirstEditable([els.dz_main, els.dz_mid, els.dz_rem]);
+}
+
+function finishMode() {
+  setProgress(total, total);
+  els.skipBtn.disabled = true;
+  els.doneScreen.classList.add("show");
+  els.tianganPanel.style.display = "none";
+  els.dizhiPanel.style.display = "none";
+  els.dizhiReversePanel.style.display = "none";
+  setStatus(`<span class="okText">完成</span>：本模式題目已全部作答。`);
+  els.doneText.textContent =
+    mode === "tiangan"
+      ? "你已完成「天干臨官位」全部 30 題。"
+      : "你已完成「地支藏干」全部 24 題。";
 }
 
 function nextQuestion() {
-  if (remainingQuestions.length === 0) {
-    clearMarks();
-    locked = false;
-    setProgress();
-    updateStatsDisplay();
-    const total = answeredCount;
-    const accuracy = total > 0 ? Math.round((correctCount / total) * 100) : 0;
-    const totalSeconds = totalAnswerMs / 1000;
-    const minutes = Math.floor(totalSeconds / 60);
-    const seconds = Math.round(totalSeconds % 60);
-    const secStr = String(seconds).padStart(2, "0");
-    setStatus(
-      `<span class="okText">恭喜完成 60 題！</span><br>` +
-      `正確率：${accuracy}%　｜　總時間：${minutes}:${secStr}<br>` +
-      `可按「進度歸 0」重新開始一輪。`
-    );
-    els.checkBtn.disabled = true;
-    els.nextBtn.disabled = true;
-    els.revealBtn.disabled = true;
-    els.resetBtn.disabled = true;
+  if (bank.length === 0) return finishMode();
+  current = bank.pop();
+  renderQuestion();
+}
+
+function startMode(nextMode) {
+  mode = nextMode;
+  els.skipBtn.disabled = false;
+  showQuiz();
+
+  if (mode === "tiangan") {
+    bank = shuffleInPlace(buildTianganBank());
+    total = bank.length;
+    nextQuestion();
     return;
   }
 
-  currentQuestion = remainingQuestions.pop();
-  currentRow = DATA[currentQuestion.rowIndex];
-  setGivenField(currentQuestion.givenFieldKey);
-  setProgress();
-  fillInputsForNewQuestion();
-}
-
-function getUserAnswers() {
-  const out = {};
-  for (const f of FIELDS) out[f.key] = els[f.key].value;
-  return out;
-}
-
-function checkAnswer() {
-  if (locked) return;
-  if (!currentRow || !givenFieldKey) nextQuestion();
-
-  clearMarks();
-
-  const now = performance.now();
-  if (questionStartTime != null) {
-    totalAnswerMs += now - questionStartTime;
-    answeredCount += 1;
-    questionStartTime = null;
-  }
-
-  const user = getUserAnswers();
-  const correct = currentRow;
-
-  let allCorrect = true;
-  const wrongKeys = [];
-
-  for (const f of FIELDS) {
-    const input = els[f.key];
-    const isGiven = input.disabled;
-    if (isGiven) {
-      input.classList.add("okInput");
-      continue;
-    }
-    let ok;
-    if (f.key === "month") {
-      ok = normalizeMonth(user[f.key]) === normalizeMonth(correct[f.key]);
-    } else if (f.key === "branchMonth") {
-      ok = normalizeBranchMonth(user[f.key]) === normalizeBranchMonth(correct[f.key]);
-    } else {
-      ok = normalize(user[f.key]) === normalize(correct[f.key]);
-    }
-    if (ok) {
-      input.classList.add("okInput");
-    } else {
-      input.classList.add("badInput");
-      allCorrect = false;
-      wrongKeys.push(f.key);
-    }
-  }
-
-  if (allCorrect) {
-    correctCount += 1;
-    updateStatsDisplay();
-    locked = true;
-    setStatus(`<span class="okText">正確</span>（50ms 後自動下一題）`);
-    window.setTimeout(() => {
-      nextQuestion();
-    }, 50);
+  if (mode === "dizhi") {
+    bank = shuffleInPlace(buildDizhiBank());
+    total = bank.length;
+    nextQuestion();
     return;
   }
-
-  const correctLine = `正解：${correct.month}／${correct.branchMonth}／${correct.jie}／${correct.qi}／${correct.season}`;
-  const wrongLabels = wrongKeys
-    .map(k => FIELDS.find(f => f.key === k)?.label ?? k)
-    .join("、");
-
-  wrongCount += 1;
-  updateStatsDisplay();
-
-  setStatus(
-    `<span class="badText">錯誤</span>（錯在：${wrongLabels}）<br>${correctLine}<br>請按「下一題」繼續。`
-  );
 }
 
-function revealAnswer() {
-  if (!currentRow) return;
-  const c = currentRow;
-  setStatus(
-    `本題正解：${c.month}／${c.branchMonth}／${c.jie}／${c.qi}／${c.season}`
-  );
-}
-
-function wireEvents() {
-  els.checkBtn.addEventListener("click", checkAnswer);
-  els.nextBtn.addEventListener("click", () => nextQuestion());
-  els.revealBtn.addEventListener("click", revealAnswer);
-  els.resetBtn.addEventListener("click", () => nextQuestion());
-  els.resetProgressBtn.addEventListener("click", resetProgress);
-
-  for (const f of FIELDS) {
-    els[f.key].addEventListener("keydown", (e) => {
-      if (e.key === "Enter" && !e.shiftKey) {
+function wireLiveValidation(inputs) {
+  for (const i of inputs) {
+    i.addEventListener("input", () => validateAndMaybeAdvance());
+    i.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
         e.preventDefault();
-        checkAnswer();
+        validateAndMaybeAdvance();
       }
     });
   }
 }
 
+function wireEvents() {
+  els.startJieqi.addEventListener("click", () => { showQuiz(); showJieqiQuiz(); });
+  els.startTiangan.addEventListener("click", () => startMode("tiangan"));
+  els.startDizhi.addEventListener("click", () => startMode("dizhi"));
+  if (els.startDizhiReverse) els.startDizhiReverse.addEventListener("click", () => startMode("dizhi_reverse"));
+  els.showTables.addEventListener("click", () => showTables());
+
+  els.backBtn.addEventListener("click", () => showMenu());
+  els.doneBackBtn.addEventListener("click", () => showMenu());
+
+  els.skipBtn.addEventListener("click", () => {
+    if (!mode) return;
+    nextQuestion();
+  });
+
+  if (jqEls.checkBtn) jqEls.checkBtn.addEventListener("click", jqCheckAnswer);
+  if (jqEls.nextBtn) jqEls.nextBtn.addEventListener("click", jqNextQuestion);
+  if (jqEls.revealBtn) jqEls.revealBtn.addEventListener("click", jqRevealAnswer);
+  if (jqEls.resetProgressBtn) jqEls.resetProgressBtn.addEventListener("click", jqResetProgress);
+  for (const f of JIEQI_FIELDS) {
+    const el = jqEls[f.key];
+    if (el) el.addEventListener("keydown", (e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); jqCheckAnswer(); } });
+  }
+
+  wireLiveValidation([els.tg_stem, els.tg_attr, els.tg_pos, els.dz_main, els.dz_mid, els.dz_rem, els.dz_rev_branch]);
+}
+
 wireEvents();
-resetProgress();
+showMenu();
     </script>
   </body>
 </html>
